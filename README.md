@@ -6,7 +6,6 @@ bootdist.py
 
 scraper3.py 
 
-   - I did not write most of the beginning code. Credit to one of the sources I've linked.
    - scrapes tabular data from the site https://www.basketball-reference.com/leagues/NBA_2019_games.html. I retained most of     the column names and have replaced columns "box","OT",and "Notes" with NA values.
    - tools: beautifulSoup to scrape, pandas for the database
    - method: to scrape page by page, simply change the url. I looped through months of a regular season (october-june) and years (1947-2019)
