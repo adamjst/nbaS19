@@ -3,13 +3,6 @@ bootdist.py
   - uploads the pickled data and calculates some statistic. 
   - Ran 10 distribtuions and calculated the std/max to maximize unique values since most were similar in magnitude. A boxplot of 6 averages for each axis (dimension of the array) was plotted using matplotlib.
 
-
-scraper3.py 
-
-   - scrapes tabular data from the site https://www.basketball-reference.com/leagues/NBA_2019_games.html. I retained most of     the column names and have replaced columns "box","OT",and "Notes" with NA values.
-   - tools: beautifulSoup to scrape, pandas for the database
-   - method: to scrape page by page, simply change the url. I looped through months of a regular season (october-june) and years (1947-2019)
-   
 step1_webscrape
     - Applies beautifulsoup to basketball reference and saves to local file
     
