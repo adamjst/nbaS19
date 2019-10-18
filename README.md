@@ -18,6 +18,9 @@ step4_splitdate
 total_data.csv
     -all regular season to playoff games from 1946-2019
     
+data.zip
+    -disaggregated data divided by regular season/playoffs and filetype
+    
 tabler.py
 
   - this script attempts to perform some linear transitivity calculations. We only consider regular season so the all the dates before 4/13.
