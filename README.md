@@ -22,7 +22,21 @@ processor_AS.py
 concatenator_AS.py
     - Combines relevant dataframes into one big dataframe.
     
-
+step1_webscrape
+    - Applies beautifulsoup to basketball reference and saves to local file
+    
+step2_localscrape
+    -Converts csvs with raw html to spreadsheet
+    
+step3_concatenator
+    -Creates one giant table from all spreadsheets
+    
+step4_splitdate
+    -Separates year from date
+    
+total_data.csv
+    -all regular season to playoff games from 1946-2019
+    
 tabler.py
 
   - this script attempts to perform some linear transitivity calculations. We only consider regular season so the all the dates before 4/13.
