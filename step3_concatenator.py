@@ -1,9 +1,11 @@
 import pandas as pd
 import glob
 
+"""Concatenate dataframes from all months, all years, all leagues. Return one centralized dataframe"""
 def df_concatenate():
+    """Convert csvs to dataframes and then concatenate before returning csv"""
     ## Set relative path for csv concatenation.
-    path = (r'data\outputs')
+    path = ('data/outputs')
     all_files = glob.glob(path + '/*.csv')
     total =[]
 
@@ -17,6 +19,6 @@ def df_concatenate():
     total = pd.concat(total, axis=0, ignore_index=True)
     print(total.columns)
 
-    total.to_csv(r"data\total_data.csv", header=True)
+    total.to_csv("data/total_data.csv", header=True)
     print(total)
 df_concatenate()
