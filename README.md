@@ -3,6 +3,12 @@ bootdist.py
   - uploads the pickled data and calculates some statistic. 
   - Ran 10 distribtuions and calculated the std/max to maximize unique values since most were similar in magnitude. A boxplot of 6 averages for each axis (dimension of the array) was plotted using matplotlib.
 
+step0:
+    mkdir data
+    mkdir data/html
+    mkdir data/html/processed
+    mkdir data/outputs
+
 step1_webscrape
     - Applies beautifulsoup to basketball reference and saves to local file
     

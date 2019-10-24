@@ -14,22 +14,22 @@ headers = {'User-Agent': 'Adam Sawyer', 'From': 'ajsawyer@syr.edu'}
 
 
 ##Set the nested loop
-def rs_scrape():
+def rs_scrape(year_start, years_back):
     """Scrape regular season game summary data and save it to a local folder in raw html form."""
     ##Set three parameters for loop: league, year, and month
     leagues = ['NBA', 'ABA', 'BAA']
     years = []
     #April,May, and June are excluded. April scaper accounts for April. May and June accounted for under playoffs.
     months = ['october', 'november', 'december', 'january', 'february', 'march', 'april']
-    years.append(2019)
-    for i in range(73):
+    years.append(year_start)
+    for i in range(years_back):
         years.append(years[i] - 1)
     for league in leagues:
         for year in years:
             for month in months:
                 # Create relative path
-                html_folder = Path('data/html/{}_{}_{}.html'.format(league, year, month), header=True)
-                csv_folder = Path('data/{}_{}_{}.csv'.format(league, year, month), header=True)
+                html_folder = Path('data', 'html', '{}_{}_{}.html'.format(league, year, month), header=True)
+                csv_folder = Path('data', '{}_{}_{}.csv'.format(league, year, month), header=True)
 
                 ##Assign path, URL, and then apply Beautiful Soup
                 url = 'https://www.basketball-reference.com/leagues/{}_{}_games-{}.html'.format(league, year, month)
@@ -60,20 +60,20 @@ def rs_scrape():
 
 
 ##Set the nested loop
-def playoff_scrape():
+def playoff_scrape(year_start, years_back):
     """Scrape regular season game summary data and save it to a local folder in raw html form."""
 
     ##Set three parameters for loop: league, year, and month
     leagues = ['NBA', 'ABA', 'BAA']
     years = []
-    years.append(2019)
-    for i in range(73):
+    years.append(year_start)
+    for i in range(years_back):
         years.append(years[i] - 1)
     for league in leagues:
         for year in years:
                 # Create relative path
-                html_folder = Path('data/html/{}_{}_playoffs.html'.format(league, year), header=True)
-                csv_folder = Path('data/{}_{}_playoffs.csv'.format(league, year), header=True)
+                html_folder = Path('data', 'html', '{}_{}_playoffs.html'.format(league, year), header=True)
+                csv_folder = Path('data', '{}_{}_playoffs.csv'.format(league, year), header=True)
 
                 ##Assign path, URL, and then apply Beautiful Soup
                 url = 'https://www.basketball-reference.com/playoffs/{}_{}_games.html'.format(league, year)
@@ -101,7 +101,7 @@ def playoff_scrape():
                 Html_file.close()
                 df2.to_csv(csv_folder)
                 print (league, year)#page_url.to_html(html_folder)ba
-rs_scrape()
-playoff_scrape()
+rs_scrape(2019, 73)
+playoff_scrape(2019, 73)
 
 

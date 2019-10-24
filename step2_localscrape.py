@@ -19,14 +19,14 @@ def regular_scrape():
             for mth in mths:
                 ##Assign local path, URL
                 # print(year, month)
-                html_folder = Path('data/html/processed/{}_{}_{}_processed.html'.format(league, yr, mth), header=True)
-                csv_folder = Path('data/{}_{}_{}.csv'.format(league, yr, mth), header=True)
+                html_folder = Path('data', 'html', 'processed', '{}_{}_{}_processed.html'.format(league, yr, mth), header=True)
+                csv_folder = Path('data', '{}_{}_{}.csv'.format(league, yr, mth), header=True)
                 if csv_folder.exists ():
                     pass
                 else:
                     continue
 
-                outputs = Path('data/outputs/{}_{}_{}_processed.csv'.format(league, yr, mth), header=True)
+                outputs = Path('data', 'outputs', '{}_{}_{}_processed.csv'.format(league, yr, mth), header=True)
                 #print(html_folder)
                 counter += (100 / (74 * 3 * 9))
                 page_url = open(csv_folder)
@@ -114,14 +114,14 @@ def april_scrape():
             for mth in mths:
                 ##Assign local path, URL
                 # print(year, month)
-                html_folder = Path('data/html/processed/{}_{}_{}_processed.html'.format(league, yr, mth), header=True)
-                csv_folder = Path('data/{}_{}_{}.csv'.format(league, yr, mth), header=True)
+                html_folder = Path('data', 'html', 'processed', '{}_{}_{}_processed.html'.format(league, yr, mth), header=True)
+                csv_folder = Path('data', '{}_{}_{}.csv'.format(league, yr, mth), header=True)
                 if csv_folder.exists ():
                     pass
                 else:
                     continue
 
-                outputs = Path('data/outputs/{}_{}_{}_processed.csv'.format(league, yr, mth), header=True)
+                outputs = Path('data', 'outputs', '{}_{}_{}_processed.csv'.format(league, yr, mth), header=True)
                 #print(html_folder)
                 counter += (100 / (74 * 3 * 9))
                 page_url = open(csv_folder)
@@ -214,14 +214,14 @@ def playoff_local_scrape():
         for yr in yrs:
                 ##Assign local path, URL
                 # print(year, month)
-                html_folder = Path('data/html/processed{}_{}_playoffs.html'.format(league, yr), header=True)
-                csv_folder = Path('data/{}_{}_playoffs.csv'.format(league, yr), header=True)
+                html_folder = Path('data', 'html', 'processed{}_{}_playoffs.html'.format(league, yr), header=True)
+                csv_folder = Path('data', '{}_{}_playoffs.csv'.format(league, yr), header=True)
                 if csv_folder.exists ():
                     pass
                 else:
                     continue
 
-                outputs = Path('data/outputs/{}_{}_playoffs_processed.csv'.format(league, yr), header=True)
+                outputs = Path('data', 'outputs', '{}_{}_playoffs_processed.csv'.format(league, yr), header=True)
                 #print(html_folder)
                 counter += (100 / (74 * 3 * 9))
                 page_url = open(csv_folder)
