@@ -20,6 +20,9 @@ step3_concatenator
     
 step4_splitdate
     -Separates year from date
+
+step5_transitivity
+    -Picks out random year, then picks out random 3 teams to test transitivity
     
 total_data.csv
     -all regular season to playoff games from 1946-2019
