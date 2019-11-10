@@ -20,8 +20,11 @@ step3_concatenator
     
 step4_splitdate
     -Separates year from date
+    
+step5_alignment
+    -correctly aligns the team names and points totals into correct columns
 
-step5_transitivity
+step6_transitivity
     -Picks out random year, then picks out random 3 teams to test transitivity
     
 total_data.csv
