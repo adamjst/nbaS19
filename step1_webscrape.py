@@ -29,34 +29,13 @@ def rs_scrape(year_start, years_back):
             for month in months:
                 # Create relative path
                 html_folder = Path('data', 'html', '{}_{}_{}.html'.format(league, year, month), header=True)
-                csv_folder = Path('data', '{}_{}_{}.csv'.format(league, year, month), header=True)
 
                 ##Assign path, URL, and then apply Beautiful Soup
                 url = 'https://www.basketball-reference.com/leagues/{}_{}_games-{}.html'.format(league, year, month)
                     ##Acquire text from url
                 page_url = requests.get(url).text.encode('utf-8')
                 str_html = str(page_url)
-
-                soup = BeautifulSoup(page_url, "html.parser")
-                soup_html = BeautifulSoup(str_html, 'html.parser')
-
-                ##extract
-                heading = soup_html.find('div')
-                table = soup.find('tbody')
-                df = pd.DataFrame(table)
-                df2 = df.iloc[1::2]
-
-                str_head = str(heading)
-
-                if df2.empty is True:
-                    continue
-
-                ## Assign as local html file written to specific league, month, and year.
-                Html_file = open(html_folder, "w")
-                Html_file.write(str_head)
-                Html_file.close()
-                df2.to_csv(csv_folder)
-                print (month, year)#page_url.to_html(html_folder)
+                open( html_folder, 'w').write( str_html )
 
 
 ##Set the nested loop
@@ -73,35 +52,15 @@ def playoff_scrape(year_start, years_back):
         for year in years:
                 # Create relative path
                 html_folder = Path('data', 'html', '{}_{}_playoffs.html'.format(league, year), header=True)
-                csv_folder = Path('data', '{}_{}_playoffs.csv'.format(league, year), header=True)
 
                 ##Assign path, URL, and then apply Beautiful Soup
                 url = 'https://www.basketball-reference.com/playoffs/{}_{}_games.html'.format(league, year)
                 page_url = requests.get(url).text.encode('utf-8')
                 str_html = str(page_url)
+                open( html_folder, 'w').write( str_html )
 
-                soup = BeautifulSoup(page_url, "html.parser")
-                soup_html = BeautifulSoup(str_html, 'html.parser')
-
-                ##extract
-                heading = soup_html.find('div')
-                table = soup.find('tbody')
-
-                df = pd.DataFrame(table)
-                df2 = df.iloc[1::2]
-
-                str_head = str(heading)
-
-                if df2.empty is True:
-                    continue
-
-
-                Html_file = open(html_folder, "w")
-                Html_file.write(str_head)
-                Html_file.close()
-                df2.to_csv(csv_folder)
                 print (league, year)#page_url.to_html(html_folder)ba
-rs_scrape(2019, 73)
-playoff_scrape(2019, 73)
+rs_scrape(2019, 3)
+playoff_scrape(2019, 3)
 
 

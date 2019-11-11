@@ -5,37 +5,36 @@ from pathlib import Path
 
 """Scrape local html file and return in html and formatted csv"""
 
-def regular_scrape():
+def regular_scrape(year_start, years_back):
     """Scrape local html file for regular season data and return in html and csv in separate output folders"""
     counter = 0
     leagues = ['NBA', 'ABA', 'BAA']
     mths = ['october', 'november', 'december', 'january', 'february', 'march']
     yrs = []
-    yrs.append(2019)
-    for i in range(73):
+    yrs.append(year_start)
+    for i in range(years_back):
         yrs.append(yrs[i] - 1)
     for league in leagues:
         for yr in yrs:
             for mth in mths:
                 ##Assign local path, URL
-                # print(year, month)
-                html_folder = Path('data', 'html', 'processed', '{}_{}_{}_processed.html'.format(league, yr, mth), header=True)
-                csv_folder = Path('data', '{}_{}_{}.csv'.format(league, yr, mth), header=True)
-                if csv_folder.exists ():
-                    pass
-                else:
-                    continue
+                print(yr, mth)
+                html_folder = Path('data', 'html', '{}_{}_{}.html'.format(league, yr, mth), header=True)
 
                 outputs = Path('data', 'outputs', '{}_{}_{}_processed.csv'.format(league, yr, mth), header=True)
                 #print(html_folder)
                 counter += (100 / (74 * 3 * 9))
-                page_url = open(csv_folder)
+                page_url = open(html_folder)
                 #Apply Beautiful Soup to determine columns of new table##
                 soup = BeautifulSoup(page_url, "html.parser")
 
                 #print(soup.prettify())
                     ##extract table
-                #table = soup.find('tbody')
+                table = soup.find('tbody')
+
+                # if this month is empty or the page is wrong
+                if not table:
+                    continue
 
 
                 ## Create boxes for each data point for scraping ##
@@ -54,7 +53,7 @@ def regular_scrape():
 
                 ## Find and extract relevant data point and then append under appropriate column. For Box Score, extract underlying hyperlink ##
 
-                for row in soup.find_all('tr'):
+                for row in table.find_all('tr'):
                     dat = row.find('th')
                     #print(dat)
                     if dat.get_text() == 'Playoffs':
@@ -97,39 +96,37 @@ def regular_scrape():
                     df.columns = ['date','start','visitor','visitor.pts','home','home.pts','boxscore','ot','attend', 'round']
 
                     df.to_csv((outputs), header=True)
-                    df.to_html((html_folder), header=True)
                 #print(yr, mth)
 
-def april_scrape():
+def april_scrape(year_start, years_back):
     """Scrape local html file for April (a mixed-regular season/playoff month) and return in html and formatted csv"""
     counter = 0
     leagues = ['NBA', 'ABA', 'BAA']
     mths = ['april']
     yrs = []
-    yrs.append(2019)
-    for i in range(73):
+    yrs.append(year_start)
+    for i in range(years_back):
         yrs.append(yrs[i] - 1)
     for league in leagues:
         for yr in yrs:
             for mth in mths:
                 ##Assign local path, URL
                 # print(year, month)
-                html_folder = Path('data', 'html', 'processed', '{}_{}_{}_processed.html'.format(league, yr, mth), header=True)
-                csv_folder = Path('data', '{}_{}_{}.csv'.format(league, yr, mth), header=True)
-                if csv_folder.exists ():
-                    pass
-                else:
-                    continue
+                html_folder = Path('data', 'html', '{}_{}_{}.html'.format(league, yr, mth), header=True)
 
                 outputs = Path('data', 'outputs', '{}_{}_{}_processed.csv'.format(league, yr, mth), header=True)
                 #print(html_folder)
                 counter += (100 / (74 * 3 * 9))
-                page_url = open(csv_folder)
+                page_url = open(html_folder)
                 #Apply Beautiful Soup to determine columns of new table##
                 soup = BeautifulSoup(page_url, "html.parser")
                 #print(soup.prettify())
 
-                #table = soup.find('tbody')
+                table = soup.find('tbody')
+
+                # if this month is empty or the page is wrong
+                if not table:
+                    continue
 
 
 
@@ -149,7 +146,7 @@ def april_scrape():
 
                 ## Find and extract relevant data point and then append under appropriate column. For Box Score, extract underlying hyperlink ##
 
-                for row in soup.find_all('tr'):
+                for row in table.find_all('tr'):
                     dat = row.find('th')
                     #print(dat)
                     if dat.get_text() == 'Playoffs':
@@ -199,37 +196,35 @@ def april_scrape():
 ## Assign to CSV written to specific month and year.
                     # print(df)
                     df.to_csv((outputs), header=True)
-                    df.to_html((html_folder), header=True)
 
 
-def playoff_local_scrape():
+def playoff_local_scrape(year_start, years_back):
     """Scrape local html file for playoff data and return in html and formatted csv"""
     counter = 0
     leagues = ['NBA', 'ABA', 'BAA']
     yrs = []
-    yrs.append(2019)
-    for i in range(73):
+    yrs.append(year_start)
+    for i in range(years_back):
         yrs.append(yrs[i] - 1)
     for league in leagues:
         for yr in yrs:
                 ##Assign local path, URL
                 # print(year, month)
-                html_folder = Path('data', 'html', 'processed{}_{}_playoffs.html'.format(league, yr), header=True)
-                csv_folder = Path('data', '{}_{}_playoffs.csv'.format(league, yr), header=True)
-                if csv_folder.exists ():
-                    pass
-                else:
-                    continue
+                html_folder = Path('data', 'html', '{}_{}_playoffs.html'.format(league, yr), header=True)
 
                 outputs = Path('data', 'outputs', '{}_{}_playoffs_processed.csv'.format(league, yr), header=True)
                 #print(html_folder)
                 counter += (100 / (74 * 3 * 9))
-                page_url = open(csv_folder)
+                page_url = open(html_folder)
                 #Apply Beautiful Soup to determine columns of new table##
                 soup = BeautifulSoup(page_url, "html.parser")
                 #print(soup.prettify())
 
-                #table = soup.find('tbody')
+                table = soup.find('tbody')
+
+                # if this month is empty or the page is wrong
+                if not table:
+                    continue
 
 
 
@@ -249,7 +244,7 @@ def playoff_local_scrape():
 
                 ## Find and extract relevant data point and then append under appropriate column. For Box Score, extract underlying hyperlink ##
 
-                for row in soup.find_all('tr'):
+                for row in table.find_all('tr'):
                     dat = row.find('th')
                     #print(dat)
                     if dat.get_text() == 'Playoffs':
@@ -298,8 +293,7 @@ def playoff_local_scrape():
                     df.columns = ['date','start','visitor','visitor.pts','home','home.pts','boxscore','ot','attend', 'round']
 
                     df.to_csv((outputs), header=True)
-                    df.to_html((html_folder), header=True)
 
-regular_scrape()
-playoff_local_scrape()
-april_scrape()
+regular_scrape(2019, 3)
+playoff_local_scrape(2019, 3)
+april_scrape(2019, 3)
