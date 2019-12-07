@@ -9,9 +9,10 @@ headers = {'User-Agent': 'Adam Sawyer', 'From': 'ajsawyer@syr.edu'}
 ##Source
 ##https://urllib3.readthedocs.io/en/latest/user-guide.html
 
+
 ##Set the nested loop
 def step1_scrape(league, year_start, years_back, stage):
-    """Scrape regular season and playoff game summary data and save it to a local folder in raw html form."""
+    """Scrape regular season game summary data and save it to a local folder in raw html form."""
     ##Set three parameters for loop: league, year, and month
     years = []
     # May and June accounted for under playoffs.
@@ -20,21 +21,25 @@ def step1_scrape(league, year_start, years_back, stage):
     for i in range(years_back):
         years.append(years[i] - 1)
     for year in years:
-        for month in months:
-            ##Differentiates inputs by playoffs compared to regular season
-            if stage == 'playoffs':
-                # Create relative path
-                step1_html = Path('data', 'html', '{}_{}_playoffs_step1.html'.format(league, year), header=True)
-                url = 'https://www.basketball-reference.com/playoffs/{}_{}_games.html'.format(league, year)
-            else:
-                step1_html = Path('data', 'html', '{}_{}_{}_step1.html'.format(league, year, month), header=True)
-                url = 'https://www.basketball-reference.com/leagues/{}_{}_games-{}.html'.format(league, year, month)
-
-            ##Acquire text from url
+        if stage == 'Playoffs':
+            # Create relative path
+            print('playoffs', league, year)
+            step1_html = Path('data', 'html', '{}_{}_playoffs_step1.html'.format(league, year), header=True)
+            url = 'https://www.basketball-reference.com/playoffs/{}_{}_games.html'.format(league, year)
             page_url = requests.get(url).text.encode('utf-8')
             str_html = str(page_url)
-            open( step1_html, 'w').write( str_html )
-            print(league, year, month)
+            open(step1_html, 'w').write(str_html)
+        else:
+            for month in months:
+                ##Differentiates inputs by playoffs compared to regular season
+                print(league, month, year)
+                step1_html = Path('data', 'html', '{}_{}_{}_step1.html'.format(league, year, month), header=True)
+                url = 'https://www.basketball-reference.com/leagues/{}_{}_games-{}.html'.format(league, year, month)
+                page_url = requests.get(url).text.encode('utf-8')
+                str_html = str(page_url)
+                open(step1_html, 'w').write(str_html)
+            ##Acquire text from url
+
 
 #Run function for both regular season and playoffs
 step1_scrape('NBA', 2019, 71, 'Regular')
