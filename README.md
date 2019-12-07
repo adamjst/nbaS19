@@ -19,7 +19,7 @@ step3_concatenator
     -Creates one giant table from all spreadsheets
 
 step4_transitivity
-    -Picks out random year, then picks out random 3 teams to test transitivity. WORK IN PROGRESS
+    -For each year, picks out random 3 teams to test transitivity.
     
 total_data.csv
     -all regular season to playoff games from 1946-2019
