@@ -110,6 +110,9 @@ def step2_scrape(league, year_start, years_back, stage):
                 df['Year'] = df['Date'].dt.year
                 df['Month'] = df['Date'].dt.month
 
+                #Add association variable
+                df['Association'] = league
+                
                 # prevent writing of file if empty
                 if len(df.columns) == 0:
                     continue
