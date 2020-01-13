@@ -64,7 +64,8 @@ def step2_scrape(league, year_start, years_back, stage):
             short_url = 'https://www.basketball-reference.com/boxscores/'
             round = [stage] * 250
 
-            ## Find and extract relevant data point and then append under appropriate column. For Box Score, extract underlying hyperlink ##
+            ## Find and extract relevant data point and then append under appropriate column.
+            ## For Box Score, extract underlying hyperlink ##
             for row in table.find_all('tr'):
                 dat = row.find('th')
                 # print(dat)
@@ -119,7 +120,6 @@ def step2_scrape(league, year_start, years_back, stage):
 
                 # write file
                 df.to_csv((step2_csv), header=True, line_terminator= '\n')
-
 
 # Run for each league during league's years of operation
 step2_scrape('NBA', 2019, 71, 'Regular')

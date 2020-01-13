@@ -43,9 +43,6 @@ def step1_scrape(league, year_start, years_back, stage):
                     f.write(str_html)
                     f.close()
 
-            ##Acquire text from url
-
-
 #Run function for both regular season and playoffs
 step1_scrape('NBA', 2019, 71, 'Regular')
 step1_scrape('ABA', 1976, 10, 'Regular')
