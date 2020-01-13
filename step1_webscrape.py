@@ -23,21 +23,26 @@ def step1_scrape(league, year_start, years_back, stage):
     for year in years:
         if stage == 'Playoffs':
             # Create relative path
-            print('playoffs', league, year)
+            print('playoffs', year)
             step1_html = Path('data', 'html', '{}_{}_playoffs_step1.html'.format(league, year), header=True)
             url = 'https://www.basketball-reference.com/playoffs/{}_{}_games.html'.format(league, year)
             page_url = requests.get(url).text.encode('utf-8')
-            str_html = str(page_url)
-            open(step1_html, 'w').write(str_html)
+            str_html = page_url
+            with open(step1_html, 'wb') as f:
+                f.write(str_html)
+                f.close()
         else:
             for month in months:
                 ##Differentiates inputs by playoffs compared to regular season
-                print(league, month, year)
+                print(month, year)
                 step1_html = Path('data', 'html', '{}_{}_{}_step1.html'.format(league, year, month), header=True)
                 url = 'https://www.basketball-reference.com/leagues/{}_{}_games-{}.html'.format(league, year, month)
                 page_url = requests.get(url).text.encode('utf-8')
-                str_html = str(page_url)
-                open(step1_html, 'w').write(str_html)
+                str_html = page_url
+                with open(step1_html, 'wb') as f:
+                    f.write(str_html)
+                    f.close()
+
             ##Acquire text from url
 
 

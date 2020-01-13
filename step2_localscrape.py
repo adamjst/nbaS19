@@ -28,7 +28,7 @@ def step2_scrape(league, year_start, years_back, stage):
                 step2_csv = Path('data', 'csv', '{}_{}_{}_step2.csv'.format(league, yr, mth), header=True)
 
             # open local-saved html file
-            page_url = open(step1_html)
+            page_url = open(step1_html, encoding = 'utf8')
 
             # Apply Beautiful Soup to determine columns of new table##
             soup = BeautifulSoup(page_url, "html.parser")
@@ -112,13 +112,13 @@ def step2_scrape(league, year_start, years_back, stage):
 
                 #Add association variable
                 df['Association'] = league
-                
+
                 # prevent writing of file if empty
                 if len(df.columns) == 0:
                     continue
 
                 # write file
-                df.to_csv((step2_csv), header=True)
+                df.to_csv((step2_csv), header=True, line_terminator= '\n')
 
 
 # Run for each league during league's years of operation
@@ -128,3 +128,5 @@ step2_scrape('BAA', 1949, 4, 'Regular')
 step2_scrape('NBA', 2019, 71, 'Playoffs')
 step2_scrape('ABA', 1976, 10, 'Playoffs')
 step2_scrape('BAA', 1949, 4, 'Playoffs')
+
+
