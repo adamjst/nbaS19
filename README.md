@@ -21,6 +21,9 @@ step3_concatenator
 step4_transitivity
     -For each year, picks out random 3 teams to test transitivity.
     
+step5_visualization
+    -Visualizes the transitivity rates calculated in step 4
+    
 total_data.csv
     -all regular season to playoff games from 1946-2019
     
