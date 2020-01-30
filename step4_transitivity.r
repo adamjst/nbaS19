@@ -1,13 +1,13 @@
-library(dplyr)
-library(here)
-library(ggplot2)
-library(reshape2)
+library(dplyr)                                            ####KEY####
+library(here)                                             ###Three pound signs = a new section.###
+library(ggplot2)                                          ##Two pound signs = explanatory statement of code##       
+library(reshape2)                                         #One pound sign = optional print point. Take off to see what is happening under the hood.#
 
 here()
-#read data from giant csv
+##read data from giant csv.##
 total <- read.csv(here('total_data.csv'))
 
-#Separates calendar year from season year. If month number is less than 10 (October, then subtract one from given year)
+##Separates calendar year from season year. If month number is less than 10 (October, then subtract one from given year).##
 total <- total %>%
   mutate(SeasonStart = if_else(total$Month < 10, -1, 0))
 
@@ -15,10 +15,10 @@ total$SeasonStart <- total$Year + total$SeasonStart
 
 total$Association <- as.character(total$Association)
 
-#Creates Season string to represent the whole season
+##Creates Season string to represent the whole season.##
 total$Season <- paste(total$SeasonStart, "-", total$SeasonStart+1)
 
-#Drop id columns and adjust column names
+##Drop id columns and adjust column names.##
 total <- total[ -c(1,2) ]
 names(total)[2] <- 'Visitors'
 names(total)[3] <- 'Vis.Pts'
@@ -27,157 +27,192 @@ names(total)[5] <- 'Home.Pts'
 names(total)[6] <- 'Box Score'
 names(total)[7] <- 'URL'
 
-#convert points to numeric
+##convert points to numeric.##
 total$Vis.Pts <- as.numeric(total$Vis.Pts)
 total$Home.Pts <- as.numeric(total$Home.Pts)
-tail(total)
 
-#Create a list from the separate Associations
+##Create a list from the separate Associations.##
 Association <- as.character(unique(total$Association))
-Association
 
-#Set counter for transitivity
+#Set counter for transitivity.##
 transitivity <- 0
 no_transitivity <- 0
 
-#Create transitivity function to create iterability for each association. Here, I picked 50.
-transitivity_test <- function(Association, year){
-  for(i in seq(1,50,1)) {
-    #Counts iteration
+###TRANSITIVITY FUNCTION: EXTRACTS 3 TEAMS FOR EACH YEAR. TESTS TRANSITIVITY. ADJUSTS TRANSITIVITY RATE. BUMPS UP COUNTER.###
+##Three arguments: Association (NBA, ABA, BAA), year, number of iterations.##
+transitivity_test <- function(Association, year, num_iterations){
+  ##Converts argument into something usable for loop.##
+  num_its <- num_iterations
+  ##Loop based on iteration argument##
+  for(i in seq(1, num_its, 1)){
+    ##Counts iteration.##
     #print(i)
     
-    #Subsets the games for the particular association passed in the function's argument
+    ##Subsets the games for the particular association passed in the function's argument.##
     total <- total[ which(total$Association == Association), ]
-    
-    #create list of teams competing in one year
+
+    #create list of teams competing in one year.##
     season_year <- total[ which(total$SeasonStart == year), ]
     teams <- as.character(unique(season_year$Visitors))
     
-    #pick three teams randomly
+    ##Extracts three teams randomly.##
     sample <- sample(teams, size = 3, replace = FALSE)
     sample1 <- sample[1]
     sample2 <- sample[2]
     sample3 <- sample[3]
-    
+
     ###OBTAIN BOXSCORES OF SAMPLED TEAMS###
     
-    #Find the boxscore results from the first sampled team
+    ##Find the boxscore results from the first sampled team.##
     sampled_games1 <- season_year[ which(season_year$Home == sample1 | season_year$Visitors == sample1), ]
-    
-    #Find the results from the first sampled team's schedule in which they faced team two
+
+    ##Find the results from the first sampled team's schedule in which they faced team two.##
     game1 <- sampled_games1[ which(sampled_games1$Home == sample2 | sampled_games1$Visitors == sample2), ]
     
-    #Find the boxscore results from the second sampled team
+    ##Find the boxscore results from the second sampled team.##
     sampled_games2 <- season_year[ which(season_year$Home == sample2 | season_year$Visitors == sample2), ]
     
-    #Find the results from the second sampled team's schedule in which they faced team three
+    ##Find the results from the second sampled team's schedule in which they faced team three.##
     game2 <- sampled_games2[ which(sampled_games2$Home == sample3 | sampled_games2$Visitors == sample3), ]
     
-    #Find the boxscore results from the first sampled team's schedule in which they faced team three
+    ##Find the boxscore results from the first sampled team's schedule in which they faced team three.##
     game3 <- sampled_games1[ which(sampled_games1$Home == sample3 | sampled_games1$Visitors == sample3), ]
     
     ###FIND RANDOM GAME AMONG BOXSCORES AND DETERMINE WINNER###
     
-    ##GAME 1##
-    #find random game involving two teams in same year
+    ###GAME 1###
+    ##Find random game involving two teams in same year.##
     random_game1 <- game1[sample(nrow(game1), 1), ]
     
-    #determine which points total is greater
+    ##Determine which points total is greater##
     won1 <- pmax(random_game1$Vis.Pts, random_game1$Home.Pts)
     
-    #Identify winner and convert to character
+    ##Identify winner and convert to character##
     winner1 <- if_else(won1 == random_game1$Vis.Pts, random_game1$Visitors, random_game1$Home)
     winner1 <- as.character(winner1)  
     
-    ##Game 2##
-    #find random other game involving second set of two, print winner
+    ###GAME 2###
+    ##Find random other game involving second set of two.##
     random_game2 <- game2[sample(nrow(game2), 1), ]
     
-    #determine which points total is greater
+    #Determine which points total is greater.##
     won2 <- pmax(random_game2$Vis.Pts, random_game2$Home.Pts)
     
-    #Identify winner and convert to character
+    #Identify winner and convert to character.##
     winner2 <- if_else(won2 == random_game2$Vis.Pts, random_game2$Visitors, random_game2$Home)
     winner2 <- as.character(winner2)  
     
     ##Game 3##
-    #find random other game involving first and third team, print winner
+    ##Find random other game involving first and third team.##
     random_game3 <- game3[sample(nrow(game3), 1), ]
+    #print(random_game3) #print to check the year of competition
+
     
-    #determine which points total is greater
+    ##Determine which points total is greater.##
     won3 <- pmax(random_game3$Vis.Pts, random_game3$Home.Pts)
     
-    #Identify winner and convert to character
+    ##Identify winner and convert to character.##
     winner3 <- if_else(won3 == random_game3$Vis.Pts, random_game3$Visitors, random_game3$Home)
     winner3 <- as.character(winner3)
     
     ###DETERMINE TRANSITIVITY AMONG GAME WINNERS###
     
-    #Check to ensure at least one game between three teams
-    if (length(winner1) == 0 | length(winner2) == 0 | length(winner3) == 0 )
+    ##Check to ensure at least one game between three teams.##
+    if (length(winner1) == 0 | length(winner2) == 0 | length(winner3) == 0 ){
       next
-    
-    #Print winners to show evidence of transitivity
+    }
+      
+    ##Print winners to show evidence of transitivity##
     #print(winner1)
     #print(winner2)
     #print(winner3)
     
+    ##Bump up the counter based on transitivity. Violation if all three are different. Else, transitivity is true.##
     if (length(unique(c(winner1,winner2,winner3))) != 3){
       #print('Transitivity violation')
-      ##Count transitivity violation
+      ##Count transitivity violation.##
       no_transitivity <- no_transitivity + 1
     } else{
       #print('Transitivity')
-      ##Count no transitivity violation
+      ##Count no transitivity violation.##
       transitivity <- transitivity + 1
     }
-    ###Calculate transitivity rate as transitivity divided by total tests
+    ##Calculate transitivity rate as transitivity divided by total tests##
     rate <- transitivity/(transitivity + no_transitivity)
-    #print(rate)
+    #print(rate) ##Print to see the change of rate over the duration of the iteration.##
   }
-#Return the rate to the overall matrix
+##Return the rate to the overall matrix.##
 return(rate)
 }
 
 ### APPLYING THE FUNCTION AND EXTRACTION OF TRANSITIVITY RATES ###
 
-#Create empty matrix, then cycle through season and apply transitivity function, before binding return into data frame
+###NBA##
+##Set dataframe parameters. Row number based on number of seasons. Set column names.##
+out_NBA <- data.frame(matrix(nrow = 70, ncol = 2))
+out_NBA[1] <- c(seq(1949,2018,1))
+names(out_NBA)[1] <- 'Season.Start'
+names(out_NBA)[2] <- 'Transitivity.Rate'
 
-##NBA##
-
-out_NBA <- data.frame('Rate' = numeric())
-for (i in seq(1949,2018,1)){
-  NBA <- transitivity_test('NBA', i)
-  out_NBA <- rbind(out_NBA, NBA)
+##Create row counter##
+NBA_count <- 1
+##Set loop based on years of association existence.##
+for(y in seq(1949, 2018, 1)){
+  print(y)
+  ##Exclude lockout years##
+  if (y == 1998 | y == 2011){
+    NBA_count <- NBA_count + 1
+    next
+  }
+  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
+  out_NBA$Transitivity.Rate[NBA_count] <- vapply(out_NBA$Transitivity.Rate[NBA_count], function(x)transitivity_test('NBA', y, 500), numeric(1))
+  ##Bump up the counter by one to move to the next row##
+  NBA_count <- NBA_count + 1
 }
-#Adjust column names on new data frame
-names(out_NBA)[1] <- "Transitivity.Rate"
-out_NBA <- cbind(out_NBA, Season.Start = c(seq(1949,2018,1)))
-out_NBA <- out_NBA[, c(2,1)]
-out_NBA
+##Quick summary statistics and view dataframe##
+summary(out_NBA)
+View(out_NBA)
 
-##ABA##
 
-out_ABA <- data.frame('Rate' = numeric())
-for (i in seq(1967,1975,1)){
-  ABA <- transitivity_test('ABA', i)
-  out_ABA <- rbind(out_ABA, ABA)
+###ABA###
+##Set dataframe parameters. Row number based on number of seasons. Set column names##
+out_ABA <- data.frame(matrix(nrow = 9, ncol = 2))
+out_ABA[1] <- c(seq(1967,1975,1))
+names(out_ABA)[1] <- 'Season.Start'
+names(out_ABA)[2] <- 'Transitivity.Rate'
+
+##Create row counter##
+ABA_count <- 1
+##Set loop based on years of association existence.##
+for(y in seq(1967, 1975,1)){
+  print(y)
+  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
+  out_ABA$Transitivity.Rate[ABA_count] <- vapply(out_ABA$Transitivity.Rate[ABA_count], function(x)transitivity_test('ABA', y, 500), numeric(1))
+  ##Bump up the counter by one to move to the next row##
+  ABA_count <- ABA_count + 1
 }
-#Adjust column names on new data frame
-names(out_ABA)[1] <- "Transitivity.Rate"
-out_ABA <- cbind(out_ABA, Season.Start = c(seq(1967,1975,1)))
-out_ABA <- out_ABA[, c(2,1)]
-out_ABA
+##Quick summary statistics and view dataframe##
+summary(out_ABA)
+View(out_ABA)
 
-##BAA##
 
-out_BAA <- data.frame('Rate' = numeric())
-for (i in seq(1946,1948,1)){
-  BAA <- transitivity_test('BAA', i)
-  out_BAA <- rbind(out_BAA, BAA)
+###BAA###
+##Set dataframe parameters. Row number based on number of seasons. Set column names.##
+out_BAA <- data.frame(matrix(nrow = 3, ncol = 2))
+out_BAA[1] <- c(seq(1946,1948,1))
+names(out_BAA)[1] <- 'Season.Start'
+names(out_BAA)[2] <- 'Transitivity.Rate'
+
+##Create row counter##
+BAA_count <- 1
+##Set loop based on years of association existence.##
+for(y in seq(1946,1948,1)){
+  print(y)
+  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
+  out_BAA$Transitivity.Rate[BAA_count] <- vapply(out_BAA$Transitivity.Rate[BAA_count], function(x)transitivity_test('BAA', y, 500), numeric(1))
+  ##Bump up the counter by one to move to the next row##
+  BAA_count <- BAA_count + 1
 }
-#Adjust column names on new data frame
-names(out_BAA)[1] <- "Transitivity.Rate"
-out_BAA <- cbind(out_BAA, Season.Start = c(seq(1946,1948,1)))
-out_BAA <- out_BAA[, c(2,1)]
-out_BAA
+##Quick summary statistics and view dataframe##
+summary(out_BAA)
+View(out_BAA)
