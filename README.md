@@ -15,6 +15,9 @@ step1_webscrape
 step2_localscrape
     -Converts csvs with raw html to spreadsheet
     
+step2.5_control
+     -Permuted final score data as control
+    
 step3_concatenator
     -Creates one giant table from all spreadsheets
 
