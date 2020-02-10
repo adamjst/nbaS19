@@ -1,44 +1,59 @@
 library(ggplot2)
 library(reshape2)
+library(stringr)
+library(magrittr)
+
+##FROM https://onunicornsandgenes.blog/2017/04/23/using-r-a-function-that-adds-multiple-ggplot2-layers/
+add_points <- function(df) {
+  geom_point(aes(x = Season.Start, y = Mean), data = df)+
+  geom_errorbar(aes(ymin='Min.95', ymax='Max.95'), data = df)
+}
+
+out_NBA$Season.Start <- as.numeric(rownames(out_NBA))
+out_ABA$Season.Start <- as.numeric(rownames(out_ABA))
+out_BAA$Season.Start <- as.numeric(rownames(out_BAA))
+control_out_NBA$Season.Start <- as.numeric(rownames(control_out_NBA))
+control_out_ABA$Season.Start <- as.numeric(rownames(control_out_ABA))
+control_out_BAA$Season.Start <- as.numeric(rownames(control_out_BAA))
+
+out_NBA$Real.Permuted <- "Real"
+control_out_NBA$Real.Permuted <- "Permuted"
+out_ABA$Real.Permuted <- "Real"
+control_out_ABA$Real.Permuted <- "Permuted"
+out_BAA$Real.Permuted <- "Real"
+control_out_BAA$Real.Permuted <- "Permuted"
+
+all_NBA <- rbind(out_NBA, control_out_NBA)
+all_ABA <- rbind(out_ABA, control_out_ABA)
+all_BAA <- rbind(out_BAA, control_out_BAA)
 
 ### PLOT RESULTS ###
-##Merge the separate real and permuted##
-real_cont_NBA <- merge(out_NBA, control_out_NBA, by = "Season.Start", all.x = TRUE)
-names(real_cont_NBA)[2] <- "real"
-names(real_cont_NBA)[3] <- "permuted"
-molten_NBA <- melt(real_cont_NBA, id.vars = "Season.Start", 
-                     variable.name = 'Real.Permuted', value.name = 'Transitivity.Violation.Rate')
-#ABA#
-real_cont_ABA <- merge(out_ABA, control_out_ABA, by = "Season.Start", all.x = TRUE)
-names(real_cont_ABA)[2] <- "real"
-names(real_cont_ABA)[3] <- "permuted"
-molten_ABA <- melt(real_cont_ABA, id.vars = "Season.Start", 
-                     variable.name = 'Real.Permuted', value.name = 'Transitivity.Violation.Rate')
-#BAA#
-real_cont_BAA <- merge(out_BAA, control_out_BAA, by = "Season.Start", all.x = TRUE)
-names(real_cont_BAA)[2] <- "real"
-names(real_cont_BAA)[3] <- "permuted"
-molten_BAA <- melt(real_cont_BAA, id.vars = "Season.Start", 
-                     variable.name = 'Real.Permuted', value.name = 'Transitivity.Violation.Rate')
 
-##PLOT##
 ###Create plotting function with trendline
-molten_Assoc_plot <- function(league){
-  ggplot(league, aes(x=Season.Start, y = Transitivity.Violation.Rate, color = Real.Permuted, shape = Real.Permuted))+
-  geom_point()+
-  scale_color_manual(values = c("real"= "black", "permuted" = "gray77"))+
-  scale_shape_manual(values = c("real" = 15, "permuted" = 17))+
-  scale_size_manual(values = c("real" = 8, "permuted" = 8)) +
-  geom_smooth(method = "lm") +
-  xlab('Season') +
-  ylab('Transitivity Violation Rate') +
+Assoc_plot <- function(league){
+  ggplot(league, aes(x=Season.Start, y = Mean, group=Real.Permuted, col=Real.Permuted, fill=Real.Permuted))+
+    geom_point()+
+    geom_errorbar(aes(ymin=Mean-(Mean-Min.95), ymax=Mean+(Max.95-Mean), group = Real.Permuted), width=.2,
+                  position=position_dodge(.3))+
+    geom_smooth(method = 'lm', se = FALSE)+
+    scale_color_manual(values = c("Real"= "black", "Permuted" = "gray77"))+
+    scale_shape_manual(values = c("Real" = 15, "Permuted" = 17))+
+    scale_size_manual(values = c("Real" = 8, "Permuted" = 8)) +
+    xlab('Season') +
+    ylab('Transitivity Violation Rate') +
   theme_bw()
-  }
+}
 
 #Plot each association
-molten_Assoc_plot(molten_NBA)
-molten_Assoc_plot(molten_ABA)
-molten_Assoc_plot(molten_BAA)
+Assoc_plot(all_NBA)
+Assoc_plot(all_ABA)
+Assoc_plot(all_BAA)
+Assoc_plot(out_NBA, control_out_NBA)
+Assoc_plot(out_ABA)
+Assoc_plot(out_BAA)
+Assoc_plot(control_out_NBA)
+Assoc_plot(control_out_ABA)
+Assoc_plot(control_out_BAA)
 
 ###PLOT ALL ASSOCIATIONS TOGETHER###
 

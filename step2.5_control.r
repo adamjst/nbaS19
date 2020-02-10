@@ -2,6 +2,7 @@ library(dplyr)                                            ####KEY####
 library(here)                                             ###Three pound signs = a new section.###
 library(ggplot2)                                          ##Two pound signs = explanatory statement of code##       
 library(reshape2)                                         #One pound sign = optional print point. Take off to see what is happening under the hood.#
+library(magrittr)
 
 here()
 ##read data from giant csv.##
@@ -43,6 +44,7 @@ no_transitivity <- 0
 transitivity_test <- function(Association, year, num_iterations){
   ##Converts argument into something usable for loop.##
   num_its <- num_iterations
+  rate <- data.frame(matrix())
   ##Loop based on iteration argument##
   for(i in seq(1, num_its, 1)){
     ##Counts iteration.##
@@ -138,22 +140,50 @@ transitivity_test <- function(Association, year, num_iterations){
       transitivity <- transitivity + 1
     }
     ##Calculate transitivity rate as transitivity divided by total tests##
-    rate <- transitivity/(transitivity + no_transitivity)
+    rate[i] <- transitivity/(transitivity + no_transitivity)
     #print(rate) ##Print to see the change of rate over the duration of the iteration.##
   }
   ##Return the rate to the overall matrix.##
-  return(rate)
+  rate <- rate[-c(2:500), ]
+  rate <- data.frame(t(rate))
+  mean.tvr <- mean(rate$X1)
+  print(mean.tvr)
+  sort.tvr <- sort(rate$X1, decreasing = TRUE)
+  #print(sort.tvr)
+  max.95 <- sort.tvr[12]
+  print(max.95)
+  min.95 <- sort.tvr[488]
+  print(min.95)
+  rate.list <- list(mean.tvr, max.95, min.95)
+  #print(rate.list)
+  return(rate.list)
 }
 
 ### APPLYING THE FUNCTION AND EXTRACTION OF TRANSITIVITY RATES ###
 
+###BAA###
+##Set dataframe parameters. Row number based on number of seasons. Set column names.##
+control_out_BAA <- data.frame(matrix(nrow = 3, ncol = 3))
+##Create row counter##
+BAA_count <- 1
+##Set loop based on years of association existence.##
+for(y in seq(1946,1948,1)){
+  print(y)
+  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
+  control_out_BAA[BAA_count] <- unlist(transitivity_test('BAA', y, 500))
+  ##Bump up the counter by one to move to the next row##
+  BAA_count <- BAA_count + 1
+}
+names(control_out_BAA)[1:3] <- seq(1946,1948,1)
+control_out_BAA <- data.frame(t(control_out_BAA))
+names(control_out_BAA)[1] <- 'Mean'
+names(control_out_BAA)[2] <- 'Max.95'
+names(control_out_BAA)[3] <- 'Min.95'
+View(control_out_BAA)
+
 ###NBA##
 ##Set dataframe parameters. Row number based on number of seasons. Set column names.##
-control_out_NBA <- data.frame(matrix(nrow = 70, ncol = 2))
-control_out_NBA[1] <- c(seq(1949,2018,1))
-names(control_out_NBA)[1] <- 'Season.Start'
-names(control_out_NBA)[2] <- 'Transitivity.Rate'
-
+control_out_NBA <- data.frame(matrix(nrow = 3, ncol = 70))
 ##Create row counter##
 NBA_count <- 1
 ##Set loop based on years of association existence.##
@@ -165,54 +195,34 @@ for(y in seq(1949, 2018, 1)){
     next
   }
   ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
-  control_out_NBA$Transitivity.Rate[NBA_count] <- vapply(control_out_NBA$Transitivity.Rate[NBA_count], function(x)transitivity_test('NBA', y, 500), numeric(1))
+  control_out_NBA[NBA_count] <- unlist(transitivity_test('NBA', y, 500))
   ##Bump up the counter by one to move to the next row##
   NBA_count <- NBA_count + 1
 }
-##Quick summary statistics and view dataframe##
-summary(control_out_NBA)
+names(control_out_NBA)[1:70] <- seq(1949,2018,1)
+control_out_NBA <- data.frame(t(control_out_NBA))
+names(control_out_NBA)[1] <- 'Mean'
+names(control_out_NBA)[2] <- 'Max.95'
+names(control_out_NBA)[3] <- 'Min.95'
 View(control_out_NBA)
-
 
 ###ABA###
 ##Set dataframe parameters. Row number based on number of seasons. Set column names##
-control_out_ABA <- data.frame(matrix(nrow = 9, ncol = 2))
-control_out_ABA[1] <- c(seq(1967,1975,1))
-names(control_out_ABA)[1] <- 'Season.Start'
-names(control_out_ABA)[2] <- 'Transitivity.Rate'
-
+control_out_ABA <- data.frame(matrix(nrow = 3, ncol = 8))
 ##Create row counter##
 ABA_count <- 1
 ##Set loop based on years of association existence.##
-for(y in seq(1967, 1975,1)){
+for(y in seq(1967,1974,1)){
   print(y)
   ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
-  control_out_ABA$Transitivity.Rate[ABA_count] <- vapply(control_out_ABA$Transitivity.Rate[ABA_count], function(x)transitivity_test('ABA', y, 500), numeric(1))
+  control_out_ABA[ABA_count] <- unlist(transitivity_test('ABA', y, 500))
   ##Bump up the counter by one to move to the next row##
   ABA_count <- ABA_count + 1
 }
+names(control_out_ABA)[1:8] <- seq(1967,1974,1)
 ##Quick summary statistics and view dataframe##
-summary(control_out_ABA)
+control_out_ABA <- data.frame(t(control_out_ABA))
+names(control_out_ABA)[1] <- 'Mean'
+names(control_out_ABA)[2] <- 'Max.95'
+names(control_out_ABA)[3] <- 'Min.95'
 View(control_out_ABA)
-
-
-###BAA###
-##Set dataframe parameters. Row number based on number of seasons. Set column names.##
-control_out_BAA <- data.frame(matrix(nrow = 3, ncol = 2))
-control_out_BAA[1] <- c(seq(1946,1948,1))
-names(control_out_BAA)[1] <- 'Season.Start'
-names(control_out_BAA)[2] <- 'Transitivity.Rate'
-
-##Create row counter##
-BAA_count <- 1
-##Set loop based on years of association existence.##
-for(y in seq(1946,1948,1)){
-  print(y)
-  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
-  control_out_BAA$Transitivity.Rate[BAA_count] <- vapply(control_out_BAA$Transitivity.Rate[BAA_count], function(x)transitivity_test('BAA', y, 500), numeric(1))
-  ##Bump up the counter by one to move to the next row##
-  BAA_count <- BAA_count + 1
-}
-##Quick summary statistics and view dataframe##
-summary(control_out_BAA)
-View(control_out_BAA)
