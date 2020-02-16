@@ -22,10 +22,16 @@ step3_concatenator
     -Creates one giant table from all spreadsheets
 
 step4_transitivity
-    -For each year, picks out random 3 teams to test transitivity.
+    -For each year, picks out random 3 teams to test transitivity violation rates and assesses difference between real and NULL.
     
 step5_visualization
-    -Visualizes the transitivity rates calculated in step 4
+    -Visualizes the transitivity violation rates calculated in step 4 (DOES NOT MEASURE DIFFERENCE---SKIP FOR NOW)
+    
+step6_diff.vis
+    -Visualizes the difference in transitivity violation rates
+    
+step7_regression
+    -Applies linear regression to test association of real vs. permuted data.
     
 total_data.csv
     -all regular season to playoff games from 1946-2019
