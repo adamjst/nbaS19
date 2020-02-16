@@ -36,6 +36,9 @@ step7_regression
 total_data.csv
     -all regular season to playoff games from 1946-2019
     
+st.dev.plot.r
+    -win pct analysis and viz
+    
 data.zip
     -disaggregated data divided by regular season/playoffs and filetype
     
