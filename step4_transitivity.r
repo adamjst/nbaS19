@@ -31,14 +31,21 @@ names(total)[7] <- 'URL'
 total$Vis.Pts <- as.numeric(total$Vis.Pts)
 total$Home.Pts <- as.numeric(total$Home.Pts)
 
+##PERMUTE
+total$NULL.Vis.Pts <- sample(as.numeric(total$Vis.Pts))
+total$NULL.Home.Pts <- sample(as.numeric(total$Home.Pts))
+
 ##Create a list from the separate Associations.##
 Association <- as.character(unique(total$Association))
 
 #Set counter for transitivity.##
 transitivity <- 0
 no_transitivity <- 0
+NULL.transitivity <- 0
+NULL.no_transitivity <- 0
 
-rate <- data.frame(matrix(nrow = 500, ncol = 1))
+rate <- data.frame(matrix(nrow = 5000, ncol = 1))
+NULL.rate <- data.frame(matrix(nrow = 5000, ncol = 1))
 
 ###TRANSITIVITY FUNCTION: EXTRACTS 3 TEAMS FOR EACH YEAR. TESTS TRANSITIVITY. ADJUSTS TRANSITIVITY RATE. BUMPS UP COUNTER.###
 ##Three arguments: Association (NBA, ABA, BAA), year, number of iterations.##
@@ -89,10 +96,13 @@ transitivity_test <- function(Association, year, num_iterations){
     
     ##Determine which points total is greater##
     won1 <- pmax(random_game1$Vis.Pts, random_game1$Home.Pts)
+    NULL.won1 <- pmax(random_game1$NULL.Vis.Pts, random_game1$NULL.Home.Pts)
     
     ##Identify winner and convert to character##
     winner1 <- if_else(won1 == random_game1$Vis.Pts, random_game1$Visitors, random_game1$Home)
-    winner1 <- as.character(winner1)  
+    NULL.winner1 <- if_else(NULL.won1 == random_game1$NULL.Vis.Pts, random_game1$Visitors, random_game1$Home)
+    winner1 <- as.character(winner1) 
+    NULL.winner1 <- as.character(NULL.winner1)
     
     ###GAME 2###
     ##Find random other game involving second set of two.##
@@ -100,10 +110,15 @@ transitivity_test <- function(Association, year, num_iterations){
     
     #Determine which points total is greater.##
     won2 <- pmax(random_game2$Vis.Pts, random_game2$Home.Pts)
+    NULL.won2 <- pmax(random_game2$NULL.Vis.Pts, random_game2$NULL.Home.Pts)
+    
     
     #Identify winner and convert to character.##
     winner2 <- if_else(won2 == random_game2$Vis.Pts, random_game2$Visitors, random_game2$Home)
-    winner2 <- as.character(winner2)  
+    NULL.winner2 <- if_else(NULL.won2 == random_game2$NULL.Vis.Pts, random_game2$Visitors, random_game2$Home)
+    winner2 <- as.character(winner2)
+    NULL.winner2 <- as.character(NULL.winner2)  
+    
     
     ##Game 3##
     ##Find random other game involving first and third team.##
@@ -113,10 +128,14 @@ transitivity_test <- function(Association, year, num_iterations){
     
     ##Determine which points total is greater.##
     won3 <- pmax(random_game3$Vis.Pts, random_game3$Home.Pts)
+    NULL.won3 <- pmax(random_game3$NULL.Vis.Pts, random_game3$NULL.Home.Pts)
+    
     
     ##Identify winner and convert to character.##
     winner3 <- if_else(won3 == random_game3$Vis.Pts, random_game3$Visitors, random_game3$Home)
+    NULL.winner3 <- if_else(NULL.won3 == random_game3$Vis.Pts, random_game3$Visitors, random_game3$Home)
     winner3 <- as.character(winner3)
+    NULL.winner3 <- as.character(NULL.winner3)
     
     ###DETERMINE TRANSITIVITY AMONG GAME WINNERS###
     
@@ -125,6 +144,9 @@ transitivity_test <- function(Association, year, num_iterations){
       next
     }
     
+    if (length(NULL.winner1) == 0 | length(NULL.winner2) == 0 | length(NULL.winner3) == 0 ){
+      next
+    }
     ##Print winners to show evidence of transitivity##
     #print(winner1)
     #print(winner2)
@@ -140,22 +162,45 @@ transitivity_test <- function(Association, year, num_iterations){
       ##Count no transitivity violation.##
       transitivity <- transitivity + 1
     }
+    if (length(unique(c(NULL.winner1,NULL.winner2,NULL.winner3))) != 3){
+      #print('Transitivity violation')
+      ##Count transitivity violation.##
+      NULL.no_transitivity <- NULL.no_transitivity + 1
+    } else{
+      #print('Transitivity')
+      ##Count no transitivity violation.##
+      NULL.transitivity <- NULL.transitivity + 1
+    }
     ##Calculate transitivity rate as transitivity divided by total tests##
     rate[i] <- transitivity/(transitivity + no_transitivity)
-    #print(rate) ##Print to see the change of rate over the duration of the iteration.##
+    NULL.rate[i] <- NULL.transitivity/(NULL.transitivity+NULL.no_transitivity)
+    ##Print to see the change of rate over the duration of the iteration.##
   }
-  ##Return the rate to the overall matrix.##
-  rate <- rate[-c(2:500), ]
+  ##Manipulate shape of real and permuted Transitivity Violation Rates
+  rate <- rate[-c(2:5000), ]
+  NULL.rate <- NULL.rate[-c(2:5000), ]
   rate <- data.frame(t(rate))
+  #print(rate)
+  NULL.rate <- data.frame(t(NULL.rate))
+  #print(NULL.rate)
+  ##Calculate real and permuted means of Transitivity Violation Rates
   mean.tvr <- mean(rate$X1)
-  print(mean.tvr)
-  sort.tvr <- sort(rate$X1, decreasing = TRUE)
-  #print(sort.tvr)
-  max.95 <- sort.tvr[12]
-  print(max.95)
-  min.95 <- sort.tvr[488]
-  print(min.95)
-  rate.list <- list(mean.tvr, max.95, min.95)
+  #print(mean.tvr)
+  NULL.mean.tvr <- mean(NULL.rate$X1)
+  #print(NULL.mean.tvr)
+  ##Calculate difference in real and permuted TRransitivity VIolation Rates
+  TVR.diff <- c(NULL.rate$X1 - rate$X1)
+  #print(TVR.diff)
+  ##Calculate, mean and error bars of the TVR difference
+  sort.tvr.diff <- sort(TVR.diff, decreasing = TRUE)
+  #print(sort.tvr.diff)
+  mean.diff <- mean(TVR.diff)
+  max.95.diff <- sort.tvr.diff[125]
+  #print(max.95.diff)
+  min.95.diff <- sort.tvr.diff[4875]
+  #print(min.95.diff)
+  ##Save to returnable list
+  rate.list <- list(mean.tvr, NULL.mean.tvr, mean.diff, max.95.diff, min.95.diff)
   #print(rate.list)
   return(rate.list)
 }
@@ -164,27 +209,30 @@ transitivity_test <- function(Association, year, num_iterations){
 
 ###BAA###
 ##Set dataframe parameters. Row number based on number of seasons. Set column names.##
-out_BAA <- data.frame(matrix(nrow = 3, ncol = 3))
+out_BAA <- data.frame(matrix(nrow = 5, ncol = 3))
 ##Create row counter##
 BAA_count <- 1
 ##Set loop based on years of association existence.##
 for(y in seq(1946,1948,1)){
   print(y)
-  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
-  out_BAA[BAA_count] <- unlist(transitivity_test('BAA', y, 500))
+  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 5 iterations for each year.##
+  out_BAA[BAA_count] <- unlist(transitivity_test('BAA', y, 5000))
   ##Bump up the counter by one to move to the next row##
   BAA_count <- BAA_count + 1
 }
+##Clean columns and shape of resulting BAA dataframe
 names(out_BAA)[1:3] <- seq(1946,1948,1)
 out_BAA <- data.frame(t(out_BAA))
-names(out_BAA)[1] <- 'Mean'
-names(out_BAA)[2] <- 'Max.95'
-names(out_BAA)[3] <- 'Min.95'
+names(out_BAA)[1] <- 'TVR'
+names(out_BAA)[2] <- 'NULL.TVR'
+names(out_BAA)[3] <- 'TVR.Diff'
+names(out_BAA)[4] <- 'Max.95'
+names(out_BAA)[5] <- 'Min.95'
 View(out_BAA)
 
 ###NBA##
 ##Set dataframe parameters. Row number based on number of seasons. Set column names.##
-out_NBA <- data.frame(matrix(nrow = 3, ncol = 70))
+out_NBA <- data.frame(matrix(nrow = 5, ncol = 70))
 ##Create row counter##
 NBA_count <- 1
 ##Set loop based on years of association existence.##
@@ -195,35 +243,44 @@ for(y in seq(1949, 2018, 1)){
     NBA_count <- NBA_count + 1
     next
   }
-  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
-  out_NBA[NBA_count] <- unlist(transitivity_test('NBA', y, 500))
+  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 5 iterations for each year.##
+  out_NBA[NBA_count] <- unlist(transitivity_test('NBA', y, 5000))
   ##Bump up the counter by one to move to the next row##
   NBA_count <- NBA_count + 1
 }
+##Clean columns and shape of resulting NBA dataframe
 names(out_NBA)[1:70] <- seq(1949,2018,1)
 out_NBA <- data.frame(t(out_NBA))
-names(out_NBA)[1] <- 'Mean'
-names(out_NBA)[2] <- 'Max.95'
-names(out_NBA)[3] <- 'Min.95'
+names(out_NBA)[1] <- 'TVR'
+names(out_NBA)[2] <- 'NULL.TVR'
+names(out_NBA)[3] <- 'TVR.Diff'
+names(out_NBA)[4] <- 'Max.95'
+names(out_NBA)[5] <- 'Min.95'
+##Omit lockout years
+out_NBA <- na.omit(out_NBA)
 View(out_NBA)
+
 
 ###ABA###
 ##Set dataframe parameters. Row number based on number of seasons. Set column names##
-out_ABA <- data.frame(matrix(nrow = 3, ncol = 8))
+out_ABA <- data.frame(matrix(nrow = 5, ncol = 8))
 ##Create row counter##
 ABA_count <- 1
 ##Set loop based on years of association existence.##
 for(y in seq(1967,1974,1)){
   print(y)
-  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
-  out_ABA[ABA_count] <- unlist(transitivity_test('ABA', y, 500))
+  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 5 iterations for each year.##
+  out_ABA[ABA_count] <- unlist(transitivity_test('ABA', y, 5000))
   ##Bump up the counter by one to move to the next row##
   ABA_count <- ABA_count + 1
 }
+##Clean columns and shape of resulting ABA dataframe
 names(out_ABA)[1:8] <- seq(1967,1974,1)
 ##Quick summary statistics and view dataframe##
 out_ABA <- data.frame(t(out_ABA))
-names(out_ABA)[1] <- 'Mean'
-names(out_ABA)[2] <- 'Max.95'
-names(out_ABA)[3] <- 'Min.95'
+names(out_ABA)[1] <- 'TVR'
+names(out_ABA)[2] <- 'NULL.TVR'
+names(out_ABA)[3] <- 'TVR.Diff'
+names(out_ABA)[4] <- 'Max.95'
+names(out_ABA)[5] <- 'Min.95'
 View(out_ABA)
