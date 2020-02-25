@@ -207,6 +207,29 @@ transitivity_test <- function(Association, year, num_iterations){
 
 ### APPLYING THE FUNCTION AND EXTRACTION OF TRANSITIVITY RATES ###
 
+###WNBA###
+##Set dataframe parameters. Row number based on number of seasons. Set column names.##
+out_WNBA <- data.frame(matrix(nrow = 5, ncol = 22))
+##Create row counter##
+WNBA_count <- 1
+##Set loop based on years of association existence.##
+for(y in seq(1997,2018,1)){
+  print(y)
+  ##Apply transitivity test function to dataframe, row by row (counter) year by year (y). Currently, this is set at 500 iterations for each year.##
+  out_WNBA[WNBA_count] <- unlist(transitivity_test('WNBA', y, 5000))
+  ##Bump up the counter by one to move to the next row##
+  WNBA_count <- WNBA_count + 1
+}
+names(out_WNBA)[1:22] <- seq(1997,2018,1)
+out_WNBA <- data.frame(t(out_WNBA))
+names(out_WNBA)[1] <- 'TVR'
+names(out_WNBA)[2] <- 'NULL.TVR'
+names(out_WNBA)[3] <- 'TVR.Diff'
+names(out_WNBA)[4] <- 'Max.95'
+names(out_WNBA)[5] <- 'Min.95'
+out_WNBA$Assoc <- 'WNBA'
+View(out_WNBA)
+
 ###BAA###
 ##Set dataframe parameters. Row number based on number of seasons. Set column names.##
 out_BAA <- data.frame(matrix(nrow = 5, ncol = 3))
@@ -228,6 +251,7 @@ names(out_BAA)[2] <- 'NULL.TVR'
 names(out_BAA)[3] <- 'TVR.Diff'
 names(out_BAA)[4] <- 'Max.95'
 names(out_BAA)[5] <- 'Min.95'
+out_BAA$Assoc <- 'BAA'
 View(out_BAA)
 
 ###NBA##
@@ -258,6 +282,7 @@ names(out_NBA)[4] <- 'Max.95'
 names(out_NBA)[5] <- 'Min.95'
 ##Omit lockout years
 out_NBA <- na.omit(out_NBA)
+out_NBA$Assoc <- 'NBA'
 View(out_NBA)
 
 
@@ -283,4 +308,5 @@ names(out_ABA)[2] <- 'NULL.TVR'
 names(out_ABA)[3] <- 'TVR.Diff'
 names(out_ABA)[4] <- 'Max.95'
 names(out_ABA)[5] <- 'Min.95'
+out_ABA$Assoc <- 'ABA'
 View(out_ABA)
