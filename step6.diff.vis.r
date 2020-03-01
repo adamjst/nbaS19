@@ -5,9 +5,13 @@ library(magrittr)
 
 ##Force numeric and add association column
 out_NBA$Season.Start <- as.numeric(rownames(out_NBA))
+out_NBA$Season.num <- c(as.numeric(1:67))
 out_ABA$Season.Start <- as.numeric(rownames(out_ABA))
+out_ABA$Season.num <- c(as.numeric(1:8))
 out_BAA$Season.Start <- as.numeric(rownames(out_BAA))
+out_BAA$Season.num <- c(as.numeric(1:3))
 out_WNBA$Season.Start <- as.numeric(rownames(out_WNBA))
+out_WNBA$Season.num <- c(as.numeric(1:22))
 
 ##stack dataframes
 BAA_WNBA <- rbind(out_BAA, out_WNBA)
@@ -36,7 +40,6 @@ Assoc_plot(out_BAA)
 Assoc_plot(out_WNBA)
 Assoc_plot(all_assoc)
 
-##Plot all associations with unique colors
 all_plot <- function(league){
   ggplot(league, aes(x=Season.Start, y = TVR.Diff, shape = Assoc, color = Assoc))+
     geom_point()+

@@ -1,26 +1,31 @@
 ###REGRESSION Of Real against reference Permuted Data
 
-out_NBA$Season.Start <- as.numeric(rownames(out_NBA))
-out_ABA$Season.Start <- as.numeric(rownames(out_ABA))
-out_BAA$Season.Start <- as.numeric(rownames(out_BAA))
 all_assoc$Season.Start <- as.numeric(rownames(all_assoc))
-all_assoc[69:76, 6] <- c(as.numeric(1967:1974))
+all_assoc[68:75, 7] <- c(as.numeric(1967:1974))
+all_assoc[79:100,7] <- c(as.numeric(1997:2018))
+
+all_assoc$NBA <- ifelse(all_assoc$Assoc == 'NBA', 1, 0)
+all_assoc$ABA <- ifelse(all_assoc$Assoc == 'ABA', 1, 0)
+all_assoc$BAA <- ifelse(all_assoc$Assoc == 'BAA', 1, 0)
+all_assoc$WNBA <- ifelse(all_assoc$Assoc == 'WNBA', 1, 0)
+summary(all_assoc)
+
 
 #Is there a stastically significant difference between the real and permuted data?
 regress_control <- function(league){
-  ## Set up real and control variables of means
-  Real <- league$TVR
-  Permuted <- league$NULL.TVR
-  Season <- league$Season.Start
+  ## Set up variables
+  Diff <- league$TVR.Diff
+  Season <- league$Season.num
+  NBA <- league$NBA
+  ABA <- league$ABA
+  BAA <- league$BAA
+  WNBA <- league$WNBA
 
   ##Run linear regression models and summarize
-  ##Permuted as reference. Real + Season
-  lm.TVRs <- lm(Permuted ~ Real)
+  ##NBA as reference
+  lm.TVRs <- lm(Diff ~ Season + ABA + BAA + WNBA)
   summary(lm.TVRs)
 
 }
 ##Apply model
 regress_control(all_assoc)
-regress_control(out_NBA)
-regress_control(out_ABA)
-regress_control(out_BAA)
