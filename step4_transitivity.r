@@ -154,26 +154,26 @@ transitivity_test <- function(Association, year, num_iterations){
     
     ##Bump up the counter based on transitivity. Violation if all three are different. Else, transitivity is true.##
     if (length(unique(c(winner1,winner2,winner3))) != 3){
+      #print('Transitivity')
+      ##Count transitivity.##
+      transitivity <- transitivity + 1
+    } else{
       #print('Transitivity violation')
       ##Count transitivity violation.##
       no_transitivity <- no_transitivity + 1
-    } else{
-      #print('Transitivity')
-      ##Count no transitivity violation.##
-      transitivity <- transitivity + 1
     }
     if (length(unique(c(NULL.winner1,NULL.winner2,NULL.winner3))) != 3){
+      #print('Transitivity')
+      ##Count transitivity.##
+      NULL.transitivity <- NULL.transitivity + 1
+    } else{
       #print('Transitivity violation')
       ##Count transitivity violation.##
       NULL.no_transitivity <- NULL.no_transitivity + 1
-    } else{
-      #print('Transitivity')
-      ##Count no transitivity violation.##
-      NULL.transitivity <- NULL.transitivity + 1
     }
-    ##Calculate transitivity rate as transitivity divided by total tests##
-    rate[i] <- transitivity/(transitivity + no_transitivity)
-    NULL.rate[i] <- NULL.transitivity/(NULL.transitivity+NULL.no_transitivity)
+    ##Calculate transitivity violation rate as non transitivity divided by total tests##
+    rate[i] <- no_transitivity/(transitivity + no_transitivity)
+    NULL.rate[i] <- NULL.no_transitivity/(NULL.transitivity+NULL.no_transitivity)
     ##Print to see the change of rate over the duration of the iteration.##
   }
   ##Manipulate shape of real and permuted Transitivity Violation Rates
